@@ -11,11 +11,9 @@
   (send dest (fn [m] ((e m) args) m)))
 
 
-(invoke-event :error handlers {:foo 4})
+#_(invoke-event :error handlers {:foo 4})
 
 #_(doseq [i (range 10)]
-  (invoke-event :process handlers #(println "here"))
-   
-  ) 
+(invoke-event :process handlers #(println "here"))) 
 
 

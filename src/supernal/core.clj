@@ -24,6 +24,7 @@
        [pallet.thread.executor :as pallet]
        [supernal.sshj :as sshj]) 
   (:use 
+    [supernal.workqueue :only (queue-all)]
     [taoensso.timbre :only (error)]
     [clojure.core.strint :only (<<)]
     [supernal.topsort :only (kahn-sort)] 
@@ -91,7 +92,10 @@
     `(get-in @~'env- [:roles ~role])))
 
 (def pool
-  (executor {:prefix "supernal" :thread-group-name "supernal" :pool-size 4 :daemon true}))
+  (executor {:prefix "supernal" :thread-group-name "supernal" :pool-size 4 :daemon false}))
+
+;; (set-agent-send-off-executor! pool)
+;; (set-agent-send-executor! pool)
 
 (defn bound-future [f]
  {:pre [(ifn? f)]}; saves lots of errors
@@ -107,11 +111,10 @@
   [role f opts] 
   (let [opts-m (apply hash-map opts) rsym (gensym)]
     (if (get opts-m :join true)
-      `(wait-on 
-         (map (fn [~rsym ] 
-                (bound-future (fn [] ~(concat f (list rsym))))) (env-get ~role ~opts-m)))
-      `(map (fn [~rsym ] 
-              (bound-future (fn [] ~(concat f (list rsym))))) (env-get ~role ~opts-m))
+      `(queue-all (map (fn [~rsym ] 
+         (fn [] ~(concat f (list rsym)))) (env-get ~role ~opts-m)))
+      `(queue-all (map (fn [~rsym ] 
+          (fn [] ~(concat f (list rsym)))) (env-get ~role ~opts-m)))
       )))
 
 (defmacro execute [name* args role & opts]

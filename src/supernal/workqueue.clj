@@ -13,7 +13,7 @@
 
 (defn queue [dest f]
   (try 
-    (send dest (fn [a] (f) a))
+    (send-off dest (fn [a] (f) a))
     (catch Throwable e
       (debug "restarting agent due to" (.getMessage e)) 
       (when (= (.getMessage e) "Agent is failed, needs restart")
@@ -23,9 +23,9 @@
 ;; (queue (second agents) (fn [] (println "alive")))
 ;; (queue (second agents) (fn [] (/ 1 0 )))
 
-(defn execute [fns]
-  (doseq [f fns dest (take (count fns) (cycle agents))]
-    (queue dest f)))
+(defn queue-all [fns]
+  (doseq [f fns dest (take (count fns) (cycle agents))] (queue dest f))
+  (doseq [a agents] (await a)))
 
 (register-error-handling)
 

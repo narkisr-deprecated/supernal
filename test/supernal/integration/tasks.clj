@@ -8,7 +8,7 @@
 
 (env 
   {:roles {
-      :web #{{:host "192.168.1.26" :user "vagrant" :sudo true}}}
+      :web #{{:host "192.168.2.26" :user "vagrant" :sudo true}}}
    })
 
 (ns- deploy 
@@ -29,8 +29,10 @@
    (execute-task deploy/stop {:app-name "foo" :src artifact} :web))
 
 (fact "env option" :integration :supernal
-   (let [e {:roles {:web #{{:host "192.168.1.26" :user "vagrant" :sudo true}}} }]
+   (let [e {:roles {:web #{{:host "192.168.2.26" :user "vagrant" :sudo true}}} }]
       (execute-task deploy/stop {:app-name "foo" :src artifact} :web :env e)))
 
 (fact "with error" :integration :supernal
   (execute-task error/zero-div {:app-name "foo" :src artifact} :web))
+
+;; (shutdown-agents)

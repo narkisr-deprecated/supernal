@@ -19,5 +19,6 @@ appender('file', FileAppender) {
 
 logger('net.schmizz.sshj.transport.verification.OpenSSHKnownHosts',ERROR, ['file'])
 logger('net.schmizz.sshj.common.SecurityUtils.BouncyCastleRegistration',INFO, ['file'])
+logger('net.schmizz', INFO)
 
 root(INFO,['file'])
