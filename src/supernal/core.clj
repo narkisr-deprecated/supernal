@@ -100,8 +100,7 @@
 (defn wait-on [futures]
   "Waiting on a sequence of futures, limited by a constant pool of threads"
   (while (some identity (map (comp not future-done?) futures))
-    (Thread/sleep 1000)
-    )) 
+    (Thread/sleep 1000))) 
 
 (defmacro execute-template 
   "Executions template form"
