@@ -13,7 +13,9 @@
                  [clj-aws-s3 "0.3.6"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [narkisr/cliopatra "1.1.0"]
-                 [narkisr/clansi "1.2.0"] ]
+                 [narkisr/clansi "1.2.0"] 
+                 [org.zeromq/jzmq "3.1.1-SNAPSHOT"]
+                ]
 
   :exclusions [org.clojure/clojure]
 
@@ -23,7 +25,9 @@
 
   :profiles {:dev { 
               :dependencies [[midje "1.6.3"] [junit/junit "4.12"] ]
-              :jvm-opts ~(vec (map (fn [[p v]] (str "-D" (name p) "=" v)) {:disable-conf "true"}))
+              :jvm-opts ~(vec (map (fn [[p v]] (str "-D" (name p) "=" v)) {
+                  :disable-conf "true" :java.library.path "/home/ronen/code/jzmq/src/main/c++/.libs/"
+              }))
               :resource-paths  ["pkg/etc/"]
               :source-paths  ["dev"]           
               :set-version {
@@ -49,4 +53,5 @@
   :signing {:gpg-key "narkisr@gmail.com"}
 
   :main supernal.launch
-  )
+  ;; :repositories {"local" ~(str (.toURI (java.io.File. "/home/ronen/.m2")))}
+)
