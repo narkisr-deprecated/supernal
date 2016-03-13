@@ -1,11 +1,19 @@
 (ns supernal.zmq
  (:import
-  [org.zeromq ZMQ ZMQ$Curve]
+  [org.zeromq ZMQ ZMQ$Curve ZAuth ZContext]
   [java.nio.charset Charset] 
   )
  )
 
 (def utf8 (Charset/forName "UTF-8"))
+
+(defn zauth [context]
+  (let [zcontext (ZContext.) ]
+    (.setContext zcontext context)
+    (let [auth (ZAuth. zcontext)]
+      (.setVerbose auth true)
+      (.allow auth "127.0.0.1"))
+    ))
 
 (defn gen-key []
   (let [keypair (.. ZMQ$Curve generateKeyPair)]
@@ -13,7 +21,7 @@
      :secret  (.getBytes (.secretKey keypair) utf8) }
     )) 
 
-(def endpoint "tcp://127.0.0.1:5003")
+(def endpoint "tcp://127.0.0.1:9000")
 
 (defn reply-socket [context]
    (let [{:keys [secret public]} (gen-key) rep (.socket context ZMQ/REP) ]
@@ -28,8 +36,8 @@
         (.connect endpoint))))
 
 (defn test-curve-85 []
-  
-   (let [context (ZMQ/context 1) [public rep] (reply-socket context) req (request-socket context public)]
+   (let [context (ZMQ/context 1) auth (zauth context) 
+         [public rep] (reply-socket context) req (request-socket context public)]
       (.send req "hello")     
       (println (.recvStr rep utf8))     
       (.close req) 
@@ -37,4 +45,4 @@
       (.term context)
      ))
 
-(test-curve-85)
+;; (test-curve-85)
